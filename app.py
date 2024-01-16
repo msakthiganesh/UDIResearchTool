@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from preprocessing import get_pdf_text, get_text_chunks
 from faiss_vectorstore import create_vectorstore
+import helper
 
 app = Flask(__name__)
 
@@ -21,7 +22,7 @@ def upload():
         try:
             pdf_file = request.files['file']
             pdf_name = pdf_file.filename
-            save_path = os.path.join(os.getenv('PDF_DIR_PATH'), pdf_name)
+            save_path = os.path.join(os.getenv('UPLOAD_DIR'), pdf_name)
             pdf_file.save(save_path, )
         except Exception as e:
             return f"Error while storing the file."
@@ -31,14 +32,20 @@ def upload():
 @app.route("/injest", methods=['GET'])
 def injest_to_db():
     if request.method == 'GET':
-        try:
-            pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('PDF_DIR_PATH'))
-            document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
-            vectorstore = create_vectorstore(doc_chunks=document_chunks, embedding_type="openai")   
-            vectorstore.save_local(os.getenv('VECTORDB_OPENAI_FAISS'))
-            return "FAISS Vector DB updated successfully."
-        except Exception as e:
-            return f"Error occurred while updating FAISS Vector DB - {e}"
+        update_flag = helper.move_files_to_db(
+                source=os.getenv('UPLOAD_DIR'), 
+                destination=os.getenv('PDF_DIR')
+                )
+        if update_flag:
+            try:            
+                pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('PDF_DIR'))
+                document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
+                vectorstore = create_vectorstore(doc_chunks=document_chunks, embedding_type="openai")   
+                vectorstore.save_local(os.getenv('VECTORDB_OPENAI_FAISS'))
+                return "FAISS Vector DB updated successfully."
+            except Exception as e:
+                return f"Error occurred while updating FAISS Vector DB - {e}"
+        return "No file found to injest."
 
 
 @app.route("/fetch", methods=['GET'])
