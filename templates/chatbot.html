@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script id="replace_with_navbar" src="./navbar.html"></script>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+  
+    .chat-container {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 20px;
+    }
+  
+    .user-message {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      align-self: flex-end;
+    }
+  
+    .bot-message {
+      background-color: #008CBA;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      align-self: flex-start;
+    }
+  
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+    }
+  
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+  
+    button {
+      padding: 10px 20px;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+
+
+  <script>
+    function sendMessage() {
+      var inputElement = document.getElementById('user-input');
+      var message = inputElement.value.trim();
+
+      if (message !== '') {
+        var chatContainer = document.getElementById('chat-container');
+        var userMessage = document.createElement('div');
+        userMessage.className = 'user-message';
+        userMessage.textContent = message;
+        chatContainer.appendChild(userMessage);
+
+        // Simulate bot response (replace with actual chatbot logic)
+        var botMessage = document.createElement('div');
+        botMessage.className = 'bot-message';
+        botMessage.textContent = 'Bot: Thanks for your message!';
+        chatContainer.appendChild(botMessage);
+
+        // Clear input field
+        inputElement.value = '';
+
+        // Scroll to the bottom of the chat
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+  </script>
+</head>
+<body>
+  <!--Navigation bar-->
+<div id="nav-placeholder">
+
+</div>
+
+
+
+<!-- Chatbot code starts-->
+  <div id="chat-container" class="chat-container">
+    <!-- Chat messages will be displayed here -->
+  </div>
+  <div class="input-container">
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+<!--Chatbot code ends-->
+</body>
+</html>
