@@ -36,15 +36,24 @@ def injest_to_db():
                 source=os.getenv('UPLOAD_DIR'), 
                 destination=os.getenv('PDF_DIR')
                 )
-        if update_flag:
+        merge_flag = helper.create_or_merge(vector_db="faiss")
+        if update_flag and merge_flag: # Merge new uploads to vector DB
+            try:
+                pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('UPLOAD_DIR'))
+                document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
+                vectorstore = create_vectorstore(doc_chunks=document_chunks, embedding_type="openai")   
+                # ! Implement - Logic to merge
+            except Exception as e:
+                return e
+        elif update_flag: # Create a new vector DB
             try:            
                 pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('PDF_DIR'))
                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
                 vectorstore = create_vectorstore(doc_chunks=document_chunks, embedding_type="openai")   
                 vectorstore.save_local(os.getenv('VECTORDB_OPENAI_FAISS'))
-                return "FAISS Vector DB updated successfully."
+                return "FAISS Vector DB created successfully."
             except Exception as e:
-                return f"Error occurred while updating FAISS Vector DB - {e}"
+                return f"Error occurred while creating FAISS Vector DB - {e}"
         return "No file found to injest."
 
 

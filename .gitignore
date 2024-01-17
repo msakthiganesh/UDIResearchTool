@@ -1,6 +1,6 @@
 .env
-data_dir/*
-db/openai/faiss/*
+data_dir/**
+db/openai/faiss/**
 .idea
 __pycache__
-uploads/*
+uploads/**

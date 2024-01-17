@@ -9,6 +9,21 @@ def db_filenames(vectordb:str="faiss") -> List[str]:
             f.write(str(files))
         return files  
     
+
+def create_or_merge(vector_db:str) -> bool:
+    """_summary_
+
+    Args:
+        db (str): Type of Vector Database
+
+    Returns:
+        bool: Returns True if Vector DB already exists. Else, returns False.
+    """
+    if vector_db == "faiss":
+        if "index.faiss" in os.listdir(os.getenv('VECTORDB_OPENAI_FAISS')):
+            return True
+        return False
+    
 def move_files_to_db(source:str, destination:str) -> bool:
     files_to_move = os.listdir(source)
     if len(files_to_move)>0:
