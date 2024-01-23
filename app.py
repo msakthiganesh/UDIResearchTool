@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from preprocessing import get_pdf_text, get_text_chunks
 from faiss_vectorstore import create_vectorstore, update_vectorstore
+from rag import get_conversation_chain
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores.faiss import FAISS
 import helper
 
 app = Flask(__name__)
@@ -72,10 +75,23 @@ def fetch():
 
 
 @app.route("/generate", methods=['POST'])
+# ! TODO: Add params: model_type, vectordb.
+# ! TODO: Option to reset conversation.
+# ! TODO: Add chat history
 def generate():
     if request.method == 'POST':
-        # RAG system using the input query
-        return "Generate Method executed."
+        if request.form.get('query'):
+            chat_history = ''
+            # RAG system using the input query - without chat history
+            embedding = OpenAIEmbeddings()
+            vectordb = FAISS.load_local(os.getenv('VECTORDB_OPENAI_FAISS'), embeddings=embedding)
+            conversation_chain = get_conversation_chain(vectorstore=vectordb, model_type='openai')
+            response = conversation_chain({"question": request.form.get('query'), "chat_history": chat_history})
+            response["source_documents"][0].metadata['page'] += 1
+            answer = f'{response["answer"]} \n\n Source: {response["source_documents"][0].metadata}'
+            return answer
+        else:
+            return "Please type your question."
 
 
 if __name__ == '__main__':

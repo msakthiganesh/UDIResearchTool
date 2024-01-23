@@ -44,8 +44,3 @@ def move_files_to_store(source: str, destination: str) -> bool:
             print(f"Error while moving files - {e}")
     return False
 
-
-# def merge_vectorstore(upload_vector):
-#     vectorstore = FAISS.load_local("index", os.getenv('VECTORDB_OPENAI_FAISS'))
-#     vectorstore.merge_from(upload_vector)
-#     return vectorstore
