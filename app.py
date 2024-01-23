@@ -1,3 +1,4 @@
+import json
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
@@ -61,10 +62,13 @@ def ingest_to_db():
 
 
 @app.route("/fetch", methods=['GET'])
+# ! TODO:Add params: embedding, vectordb
 def fetch():
     if request.method == 'GET':
         # Fetch all the filenames in the database and return the list
-        return "Fetch method executed."
+        with open(os.path.join(os.getenv('VECTORDB_OPENAI_FAISS'), 'faiss_files.txt'), 'r') as f:
+            faiss_files = f.read()
+        return json.dumps(faiss_files)
 
 
 @app.route("/generate", methods=['POST'])
