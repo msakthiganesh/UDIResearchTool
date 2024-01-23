@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from preprocessing import get_pdf_text, get_text_chunks
-from faiss_vectorstore import create_vectorstore
+from faiss_vectorstore import create_vectorstore, update_vectorstore
 import helper
 
 app = Flask(__name__)
@@ -31,49 +31,30 @@ def upload():
 
 
 @app.route('/ingest', methods=['GET'])
+# ! TODO: Change embedding_type to param and pass as input in API call
 def ingest_to_db():
     if request.method == 'GET':
         update_flag = helper.move_files_to_store(source=os.getenv('UPLOAD_DIR'), destination=os.getenv('DATASTORE_DIR'))
         merge_flag = helper.create_or_merge(vector_db='faiss')
+        print(update_flag, merge_flag)
         if update_flag and merge_flag:  # Merge new uploads to vector DB
-            pass
+            print("Updating VDB")
+            pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('UPLOAD_DIR'))
+            document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
+            upload_vectors = create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=False)
+            update_vectorstore(upload_vector=upload_vectors, embedding_type='openai')
+            return "Vector DB updated successfully."
+
         elif update_flag:  # Create a new vector DB
+            print("Creating VDB")
             pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('DATASTORE_DIR'))
             document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
-            # ! TODO: Change embedding_type to param and pass as input in API call
-            vectorstore = create_vectorstore(doc_chunks=document_chunks, embedding_type='openai')
-            vectorstore.save_local(folder_path=os.getenv('VECTORDB_OPENAI_FAISS'), index_name='faiss')
+            create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=True)
             return "FAISS Vector DB created successfully."
 
+        else:
+            return "No file found. Please upload files to ingest."
 
-# @app.route("/ingest", methods=['GET'])
-# def ingest_to_db():
-#     if request.method == 'GET':
-#         update_flag = helper.move_files_to_db(
-#                 source=os.getenv('UPLOAD_DIR'),
-#                 destination=os.getenv('PDF_DIR')
-#                 )
-#         merge_flag = helper.create_or_merge(vector_db="faiss")
-#         if update_flag and merge_flag: # Merge new uploads to vector DB
-#             try:
-#                 pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('UPLOAD_DIR'))
-#                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
-#                 upload_vectors = create_vectorstore(doc_chunks=document_chunks, embedding_type="openai")
-#                 vectorstore = helper.merge_vectorstore(upload_vector=upload_vectors)
-#                 vectorstore.save_local(os.getenv('VECTORDB_OPENAI_FAISS'))
-#                 return f"FAISS Vector DB updated successfully. - {vectorstore.docstore._dict}"
-#             except Exception as e:
-#                 return f"Error occured while updating the FAISS Vector DB - {e}"
-#         elif update_flag: # Create a new vector DB
-#             try:
-#                 pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('DATA_DIR'))
-#                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
-#                 vectorstore = create_vectorstore(doc_chunks=document_chunks, embedding_type="openai")
-#                 vectorstore.save_local(folder_path=os.getenv('VECTORDB_OPENAI_FAISS'), index_name='faiss')
-#                 return "FAISS Vector DB created successfully."
-#             except Exception as e:
-#                 return f"Error occurred while creating FAISS Vector DB - {e}"
-#         return "No file found to injest."
 
 
 @app.route("/fetch", methods=['GET'])

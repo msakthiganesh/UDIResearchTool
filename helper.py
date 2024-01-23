@@ -2,13 +2,14 @@ import os
 from pathlib import Path
 from typing import List
 import shutil
-from langchain_community.vectorstores.faiss import FAISS as FAISS_C
+# from langchain_community.vectorstores.faiss import FAISS as FAISS_C
+from langchain.vectorstores.faiss import FAISS
 
 
 def db_filenames(vectordb: str = "faiss") -> List[str]:
     if vectordb == "faiss":
         files = os.listdir(os.getenv('DATASTORE_DIR'))
-        with open("./db/openai/faiss/faiss_files.txt", 'w+') as f:
+        with open("db/openai/faiss/faiss_files.txt", 'w+') as f:
             f.write(str(files))
         return files
 
@@ -24,8 +25,8 @@ def create_or_merge(vector_db: str) -> bool:
         :param vector_db:
     """
     if vector_db == "faiss":
-        # if Path(os.getenv('VECTORDB_OPENAI_FAISS'))
-        #     return True
+        if os.path.isfile(os.path.join(os.getenv('VECTORDB_OPENAI_FAISS'), 'index.faiss')):
+            return True
         return False
 
 
@@ -44,7 +45,7 @@ def move_files_to_store(source: str, destination: str) -> bool:
     return False
 
 
-def merge_vectorstore(upload_vector):
-    vectorstore = FAISS_C.load_local("index", os.getenv('VECTORDB_OPENAI_FAISS'))
-    vectorstore.merge_from(upload_vector)
-    return vectorstore
+# def merge_vectorstore(upload_vector):
+#     vectorstore = FAISS.load_local("index", os.getenv('VECTORDB_OPENAI_FAISS'))
+#     vectorstore.merge_from(upload_vector)
+#     return vectorstore

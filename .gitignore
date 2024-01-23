@@ -4,3 +4,4 @@ db/openai/faiss/**
 __pycache__
 uploads/**
 /datastore/
+/testing/
