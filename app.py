@@ -34,27 +34,30 @@ def upload():
 # ! TODO: Change embedding_type to param and pass as input in API call
 def ingest_to_db():
     if request.method == 'GET':
-        update_flag = helper.move_files_to_store(source=os.getenv('UPLOAD_DIR'), destination=os.getenv('DATASTORE_DIR'))
+        upload_flag = helper.move_files_to_store(source=os.getenv('UPLOAD_DIR'), destination=os.getenv('DATASTORE_DIR'))
         merge_flag = helper.create_or_merge(vector_db='faiss')
-        print(update_flag, merge_flag)
-        if update_flag and merge_flag:  # Merge new uploads to vector DB
-            print("Updating VDB")
-            pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('UPLOAD_DIR'))
-            document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
-            upload_vectors = create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=False)
-            update_vectorstore(upload_vector=upload_vectors, embedding_type='openai')
-            return "Vector DB updated successfully."
 
-        elif update_flag:  # Create a new vector DB
-            print("Creating VDB")
-            pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('DATASTORE_DIR'))
-            document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
-            create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=True)
-            return "FAISS Vector DB created successfully."
+        if upload_flag and merge_flag:  # Merge new uploads to vector DB
+            try:
+                pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('UPLOAD_DIR'))
+                document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
+                upload_vectors = create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=False)
+                update_vectorstore(upload_vector=upload_vectors, embedding_type='openai')
+                return "Vector DB updated successfully."
+            except Exception as e:
+                return f"Error occurred while updating Vector Database."
+
+        elif upload_flag:  # Create a new vector DB
+            try:
+                pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('DATASTORE_DIR'))
+                document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
+                create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=True)
+                return "FAISS Vector DB created successfully."
+            except Exception as e:
+                return f"Error occurred while creating Vector Database."
 
         else:
             return "No file found. Please upload files to ingest."
-
 
 
 @app.route("/fetch", methods=['GET'])
