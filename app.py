@@ -8,11 +8,17 @@ from rag import get_conversation_chain
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.faiss import FAISS
 import helper
+import logging
 
 app = Flask(__name__)
+logging.basicConfig(filename='logs.log',
+                    level=logging.INFO,
+                    filemode='w',
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logger = logging.getLogger()
 
 load_dotenv()
-
+logger.info("Environment Variables loaded.")
 
 @app.route("/")
 def home():
