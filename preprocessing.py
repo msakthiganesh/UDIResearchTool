@@ -10,7 +10,7 @@ def get_pdf_text(pdf_dir_path:str):
         pdf_dir_path (str): Path to the directory containing the PDF Files / PDF Database
     """
     
-    pdf_loader = PyPDFDirectoryLoader(os.getenv('PDF_DIR_PATH'))
+    pdf_loader = PyPDFDirectoryLoader(os.getenv('DATASTORE_DIR'))
     pdf_docs = pdf_loader.load()
     return pdf_docs
 

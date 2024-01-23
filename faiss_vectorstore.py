@@ -17,13 +17,13 @@ def create_vectorstore(doc_chunks, embedding_type:str = "openai", save_db:bool=T
     )
     filenames = helper.db_filenames(vectordb="faiss")
     if save_db:
-        vectorstore.save_local(os.getenv('VECTORDB_OPENAI_FAISS'))
+        vectorstore.save_local(folder_path=os.getenv('VECTORDB_OPENAI_FAISS'), index_name='faiss')
     return vectorstore
 
 
 def update_vectorstore(embedding_type:str="openai"):
     if embedding_type == "openai":
-        vectorstore = FAISS.load_local(os.getenv('VECTORDB_OPENAI_FAISS'))
+        vectorstore = FAISS.load_local(folder_path=os.getenv('VECTORDB_OPENAI_FAISS'), index_name='faiss')
         
         
         
