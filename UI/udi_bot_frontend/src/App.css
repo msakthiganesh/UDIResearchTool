@@ -8,10 +8,8 @@
 }
 
 .app-container {
-  width: 1000px;
-  max-width: 100%;
-  padding: 0 20px;
-  text-align: center;
+  display: flex; /* Use flex to position the elements */
+  align-items: flex-start; /* Align items to the top */
 }
 
 .spotlight__wrapper {
@@ -20,6 +18,7 @@
   margin: auto;
   max-width: 600px;
   background-color: #fff;
+  flex: 1; /* Allow the spotlight wrapper to take up remaining space */
 }
 
 .spotlight__wrapper:hover,
@@ -72,8 +71,8 @@
 }
 
 .pdf-renderer {
-   flex-basis: calc(50% - 20px); /* Adjust the width of the PDF viewer */
-   padding-left:20px; /* Add padding to separate from spotlight wrapper */
+  flex-basis: calc(50% - 20px); /* Adjust the width of the PDF viewer */
+  padding-left: 20px; /* Add padding to separate from spotlight wrapper */
 }
 
 @keyframes cursor-blink {
