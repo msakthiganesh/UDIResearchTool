@@ -71,6 +71,11 @@
   animation: cursor-blink 1s steps(2) infinite;
 }
 
+.pdf-renderer {
+   flex-basis: calc(50% - 20px); /* Adjust the width of the PDF viewer */
+   padding-left:20px; /* Add padding to separate from spotlight wrapper */
+}
+
 @keyframes cursor-blink {
   0% {
     opacity: 0;

@@ -2,11 +2,25 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import lens from "./assets/lens.png";
 import loadingGif from "./assets/loadingGif.gif";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+import { Document, Page, pdfjs } from "react-pdf";
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 function App() {
   const [prompt, updatePrompt] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState(undefined);
+
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+  };
+
+  const goToPrevPage = () => setPageNumber((prevPage) => prevPage - 1);
+  const goToNextPage = () => setPageNumber((prevPage) => prevPage + 1);
+
 
   useEffect(() => {
     if (prompt != null && prompt.trim() === "") {
@@ -41,24 +55,45 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <div className="app-container">
-        <div className="spotlight__wrapper">
-          <input
-              type="text"
-              className="spotlight__input"
-              placeholder="Ask me anything..."
-              disabled={loading}
-              style={{
-                backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
-              }}
-              onChange={(e) => updatePrompt(e.target.value)}
-              onKeyDown={(e) => sendPrompt(e)}
-          />
-          <div className="spotlight__answer">{answer && <p>{answer}</p>}</div>
+
+      <div className="app">
+        <div className="app-container">
+          <div className="spotlight__wrapper">
+            <input
+                type="text"
+                className="spotlight__input"
+                placeholder="Ask me anything..."
+                disabled={loading}
+                style={{
+                  backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
+                }}
+                onChange={(e) => updatePrompt(e.target.value)}
+                onKeyDown={(e) => sendPrompt(e)}
+            />
+            <div className="spotlight__answer">{answer && <p>{answer}</p>}</div>
+          </div>
+        </div>
+        <div className="pdf-renderer">
+          <nav>
+            <button onClick={goToPrevPage}>Prev</button>
+            <button onClick={goToNextPage}>Next</button>
+          </nav>
+          <div style={{width: 600}}>
+            <Document
+                file="./datastore/UDI Philippines Strategic Intelligence report_v2.3.pdf"
+                onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page pageNumber={pageNumber} renderAnnotationLayer={false} renderTextLayer={false} width={600}/>
+            </Document>
+          </div>
+
+          <p>
+            Page {pageNumber} of {numPages}
+          </p>
+
         </div>
       </div>
-    </div>
+
   );
 }
 
