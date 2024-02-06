@@ -1,7 +1,7 @@
 import json
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from preprocessing import get_pdf_text, get_text_chunks
 from faiss_vectorstore import create_vectorstore, update_vectorstore
 from rag import get_conversation_chain
@@ -82,7 +82,7 @@ def fetch():
         # Fetch all the filenames in the database and return the list
         with open(os.path.join(os.getenv('VECTORDB_OPENAI_FAISS'), 'faiss_files.txt'), 'r') as f:
             faiss_files = f.read()
-        return json.dumps(faiss_files)
+        return jsonify(faiss_files)
 
 
 @app.route("/generate", methods=['POST'])
@@ -92,6 +92,7 @@ def fetch():
 def generate():
     if request.method == 'POST':
         if request.form.get('query'):
+            logger.info(f"Query: {request.form.get('query')}")
             chat_history = ''
             # RAG system using the input query - without chat history
             embedding = OpenAIEmbeddings()
@@ -100,9 +101,10 @@ def generate():
             response = conversation_chain({"question": request.form.get('query'), "chat_history": chat_history})
             response["source_documents"][0].metadata['page'] += 1
             answer = f'{response["answer"]} \n\n Source: {response["source_documents"][0].metadata}'
-            return answer
+            logger.info(f"Answer: {json.dumps(answer)}")
+            return jsonify(answer)
         else:
-            return "Please type your question."
+            return jsonify("Please type your question.")
 
 
 if __name__ == '__main__':
