@@ -92,7 +92,7 @@ export default function App() {
                             file="./datastore/UDI Philippines Strategic Intelligence report_v2.3.pdf"
                             onLoadSuccess={onDocumentLoadSuccess}
                         >
-                            <Page pageNumber={pageNumber} renderAnnotationLayer={false} renderTextLayer={false}/>
+                            <Page pageNumber={pageNumber} renderAnnotationLayer={false} renderTextLayer={false} width={700}/>
                         </Document>
                     </div>
 

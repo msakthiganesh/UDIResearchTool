@@ -1,7 +1,17 @@
-.app {
+.screen {
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  /*align-items: center;*/
+  /*justify-content: center;*/
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.app {
+  height: 100%;
+  width: 60%;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.1);
@@ -10,6 +20,7 @@
 .app-container {
   display: flex; /* Use flex to position the elements */
   align-items: flex-start; /* Align items to the top */
+  width: 100%;
 }
 
 .spotlight__wrapper {
@@ -71,8 +82,8 @@
 }
 
 .pdf-renderer {
-  flex-basis: calc(50% - 20px); /* Adjust the width of the PDF viewer */
-  padding-left: 20px; /* Add padding to separate from spotlight wrapper */
+  flex-basis: inherit; /* Adjust the width of the PDF viewer */
+  padding-left: 20px;
 }
 
 @keyframes cursor-blink {
