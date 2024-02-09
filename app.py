@@ -27,10 +27,10 @@ logger.info("Environment Variables loaded.")
 
 @app.route("/")
 def home():
-    return render_template("chatbot.html")
+    return "Successfully started - UDI Research Tool Backend"
 
 
-@app.route("/upload", methods=['GET', 'POST'])
+@app.route("/upload", methods=['POST'])
 def upload():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -41,8 +41,8 @@ def upload():
             save_path = os.path.join(os.getenv('UPLOAD_DIR'), pdf_name)
             pdf_file.save(save_path, )
         except Exception as e:
-            return f"Error while storing the file."
-        return f"File - {pdf_name} uploaded."
+            return jsonify(status = 500, success = False, message = e)
+        return jsonify(status = 200, success=True, message='File uploaded successfully.')
 
 
 @app.route('/ingest', methods=['GET'])
@@ -58,21 +58,21 @@ def ingest_to_db():
                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
                 upload_vectors = create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=False)
                 update_vectorstore(upload_vector=upload_vectors, embedding_type='openai')
-                return "Vector DB updated successfully."
+                return jsonify(status = 200, success=True, message='Vector DB updated successfully.')
             except Exception as e:
-                return f"Error occurred while updating Vector Database."
+                return jsonify(status = 500, success = False, message = 'Error occurred while updating Vector Database.')
 
         elif upload_flag:  # Create a new vector DB
             try:
                 pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('DATASTORE_DIR'))
                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
                 create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=True)
-                return "FAISS Vector DB created successfully."
+                return jsonify(status = 200, success=True, message='Vector DB created successfully.')
             except Exception as e:
-                return f"Error occurred while creating Vector Database."
+                return jsonify(status = 500, success = False, message = 'Error occurred while creating Vector Database.')
 
         else:
-            return "No file found. Please upload files to ingest."
+            return jsonify(status = 500, success = False, message = 'No file found. Please upload files to ingest.')
 
 
 @app.route("/fetch", methods=['GET'])
@@ -100,6 +100,7 @@ def generate():
             conversation_chain = get_conversation_chain(vectorstore=vectordb, model_type='openai')
             response = conversation_chain({"question": request.form.get('query'), "chat_history": chat_history})
             response["source_documents"][0].metadata['page'] += 1
+            response["source_documents"][0].metadata['source'] = response["source_documents"][0].metadata['source'][19:]
             answer = f'{response["answer"]} \n\n Source: {response["source_documents"][0].metadata}'
             logger.info(f"Answer: {json.dumps(answer)}")
             return jsonify(answer)
