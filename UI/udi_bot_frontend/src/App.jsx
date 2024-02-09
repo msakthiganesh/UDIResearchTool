@@ -15,6 +15,8 @@ export default function App() {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [pdfFile, setPdfFile] = useState(null);
+    const [isMessageFromAPI, setIsMessageFromAPI] = useState(false);
+    const [isFileUploaded, setIsFileUploaded] = useState(false);
 
     const handlePdfRender = () => {
         if (answer) {
@@ -48,6 +50,7 @@ export default function App() {
     const handleFileUpload = async () => {
         try {
             setLoading(true);
+            setIsFileUploaded(true);
             const formData = new FormData();
             formData.append("file", pdfFile);
 
@@ -80,6 +83,8 @@ export default function App() {
 
                 // Set the answer or perform other actions based on the response
                 setAnswer("File uploaded and ingested successfully");
+                setIsMessageFromAPI(false);
+                
             }
 
         }
@@ -143,6 +148,7 @@ export default function App() {
             console.error(err, "err");
         } finally {
             setLoading(false);
+            setIsMessageFromAPI(true);
         }
     };
 
@@ -157,7 +163,7 @@ export default function App() {
                 onChange={handleFileChange}
                 style={{ display: "none" }}
             />
-            {pdfFile && (
+            {pdfFile && !isFileUploaded && (
                 <button onClick={handleFileUpload} className="submitButton">
                     Submit
                 </button>
@@ -183,9 +189,9 @@ export default function App() {
                             <p dangerouslySetInnerHTML={{ __html: JSON.parse(JSON.stringify(answer)).replace(/\n/g, '<br />') }} />
                         )}
                     </div>
-                    {answer && !showPDF && (
+                    {answer && isMessageFromAPI && !showPDF && (
                         <div className="pdf-toggle-button">
-                            <button onClick={handlePdfRender}>Show PDF</button>
+                            <button onClick={() => setShowPDF(true)}>Show PDF</button>
                         </div>
                     )}
                 </div>
