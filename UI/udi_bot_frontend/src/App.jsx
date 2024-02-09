@@ -11,6 +11,10 @@ export default function App() {
     const [prompt, updatePrompt] = useState(undefined);
     const [loading, setLoading] = useState(false);
     const [answer, setAnswer] = useState(undefined);
+    const [pdfSource, setPdfSource] = useState('')
+    const [numPages, setNumPages] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
+
     const handlePdfRender = () => {
         if (answer) {
             setShowPDF(true);
@@ -20,8 +24,7 @@ export default function App() {
     const handlePdfHide = () => {
         setShowPDF(false);
     };
-    const [numPages, setNumPages] = useState(null);
-    const [pageNumber, setPageNumber] = useState(1);
+
 
     const onDocumentLoadSuccess = ({ numPages }) => {
         setNumPages(numPages);
@@ -67,18 +70,22 @@ export default function App() {
             const sourceRegex = /Source: \{'source': '([^']+)', 'page': (\d+)\}/;
             const sourceMatch = msg_with_source.match(sourceRegex);
 
-            let source = '';
+            let pdf_source = '';
             let page = '';
 
             if (sourceMatch) {
-                source = sourceMatch[1]; // This will be your source string
+                pdf_source = sourceMatch[1]; // This will be your source string
                 page = sourceMatch[2]; // This will be your page string
+                setPdfSource(pdf_source)
+                setPageNumber(parseInt(page))
             }
 
             // Remove the 'Source' line from the message
             const message = msg_with_source.replace(sourceRegex, '');
-            console.log(message);
-            console.log(`Source: ${source}, Page: ${page}`);
+            // console.log(message);
+            // console.log(`Source: ${pdf_source}`);
+            // console.log(`Page: ${page}`);
+
             setAnswer(message);
         } catch (err) {
             console.error(err, "err");
@@ -120,7 +127,7 @@ export default function App() {
             <div className="pdf-renderer">
                 <div>
                     <Document
-                        file="./datastore/UDI Philippines Strategic Intelligence report_v2.3.pdf"
+                        file={pdfSource}
                         onLoadSuccess={onDocumentLoadSuccess}
                     >
                         <Page pageNumber={pageNumber} renderAnnotationLayer={false} renderTextLayer={false} width={700} />
