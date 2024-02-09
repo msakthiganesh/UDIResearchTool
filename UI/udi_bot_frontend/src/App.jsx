@@ -164,7 +164,7 @@ export default function App() {
             )}
         </div>
 
-        <div div className="app" >
+        <div className="app" >
             <div className="app-container">
                 <div className="spotlight__wrapper">
                     <input
