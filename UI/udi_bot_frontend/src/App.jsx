@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import lens from "./assets/lens.png";
 import loadingGif from "./assets/loadingGif.gif";
 import "react-pdf/dist/esm/Page/TextLayer.css";
-import {Document, Page, pdfjs} from "react-pdf";
+import { Document, Page, pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -11,10 +11,10 @@ export default function App() {
     const [prompt, updatePrompt] = useState(undefined);
     const [loading, setLoading] = useState(false);
     const [answer, setAnswer] = useState(undefined);
-
-    const [showPDF, setShowPDF] = useState(undefined)
     const handlePdfRender = () => {
-        setShowPDF(true);
+        if (answer) {
+            setShowPDF(true);
+        }
     };
 
     const handlePdfHide = () => {
@@ -23,12 +23,20 @@ export default function App() {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
 
-    const onDocumentLoadSuccess = ({numPages}) => {
+    const onDocumentLoadSuccess = ({ numPages }) => {
         setNumPages(numPages);
     };
+    const [showPDF, setShowPDF] = useState(false);
 
-    const goToPrevPage = () => setPageNumber((prevPage) => prevPage - 1);
-    const goToNextPage = () => setPageNumber((prevPage) => prevPage + 1);
+    // const [showPDF, setShowPDF] = useState(answer !== undefined);
+
+    const goToPrevPage = () => {
+        setPageNumber((prevPage) => Math.max(prevPage - 1, 1)); // Limit to not go below page 1
+    };
+
+    const goToNextPage = () => {
+        setPageNumber((prevPage) => Math.min(prevPage + 1, numPages)); // Limit to not go above numPages
+    };
 
 
     useEffect(() => {
@@ -53,7 +61,24 @@ export default function App() {
             if (!res.ok) {
                 throw new Error(res.toString());
             }
-            const message = await res.json();
+            const msg_with_source = await res.json();
+            console.log(msg_with_source)
+            // Extract the source and page information
+            const sourceRegex = /Source: \{'source': '([^']+)', 'page': (\d+)\}/;
+            const sourceMatch = msg_with_source.match(sourceRegex);
+
+            let source = '';
+            let page = '';
+
+            if (sourceMatch) {
+                source = sourceMatch[1]; // This will be your source string
+                page = sourceMatch[2]; // This will be your page string
+            }
+
+            // Remove the 'Source' line from the message
+            const message = msg_with_source.replace(sourceRegex, '');
+            console.log(message);
+            console.log(`Source: ${source}, Page: ${page}`);
             setAnswer(message);
         } catch (err) {
             console.error(err, "err");
@@ -63,53 +88,61 @@ export default function App() {
     };
 
     return (<div className="screen">
-            <div className="app">
-                <div className="app-container">
-                    <div className="spotlight__wrapper">
-                        <input
-                            type="text"
-                            className="spotlight__input"
-                            placeholder="Ask me anything..."
-                            disabled={loading}
-                            style={{
-                                backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
-                            }}
-                            onChange={(e) => updatePrompt(e.target.value)}
-                            onKeyDown={(e) => sendPrompt(e)}
-                        />
-                        <div className="spotlight__answer">{answer && <p>{answer}</p>}</div>
+        <div className="navbar">Navbar content here</div>
+        <div className="app">
+            <div className="app-container">
+                <div className="spotlight__wrapper">
+                    <input
+                        type="text"
+                        className="spotlight__input"
+                        placeholder="Ask me anything..."
+                        disabled={loading}
+                        style={{
+                            backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
+                        }}
+                        onChange={(e) => updatePrompt(e.target.value)}
+                        onKeyDown={(e) => sendPrompt(e)}
+                    />
+                    <div className="spotlight__answer">
+                        {answer && (
+                            <p dangerouslySetInnerHTML={{ __html: JSON.parse(JSON.stringify(answer)).replace(/\n/g, '<br />') }} />
+                        )}
                     </div>
+                    {answer && !showPDF && (
+                        <div className="pdf-toggle-button">
+                            <button onClick={handlePdfRender}>Show PDF</button>
+                        </div>
+                    )}
                 </div>
             </div>
-
-            {showPDF ? (<div className="pdf-renderer">
-                    <nav>
-                        <button onClick={goToPrevPage}>Prev</button>
-                        <button onClick={goToNextPage}>Next</button>
-                    </nav>
-                    <div>
-                        <Document
-                            file="./datastore/UDI Philippines Strategic Intelligence report_v2.3.pdf"
-                            onLoadSuccess={onDocumentLoadSuccess}
-                        >
-                            <Page pageNumber={pageNumber} renderAnnotationLayer={false} renderTextLayer={false} width={700}/>
-                        </Document>
-                    </div>
-
-                    <p>
-                        Page {pageNumber} of {numPages}
-                    </p>
-                    <button onClick={handlePdfHide}>Hide PDF</button>
-                </div>) : (<button onClick={handlePdfRender}>Show PDF</button>)}
-
-
         </div>
+        {showPDF && (
+            <div className="pdf-renderer">
+                <div>
+                    <Document
+                        file="./datastore/UDI Philippines Strategic Intelligence report_v2.3.pdf"
+                        onLoadSuccess={onDocumentLoadSuccess}
+                    >
+                        <Page pageNumber={pageNumber} renderAnnotationLayer={false} renderTextLayer={false} width={700} />
+                    </Document>
+                </div>
 
+                <p>
+                    Page {pageNumber} of {numPages}
+                </p>
+                <nav className="nav">
+                    <button onClick={goToPrevPage}>Prev</button>
+                    <button onClick={goToNextPage}>Next</button>
+                </nav>
+                <div className="pdf-toggle-button">
+                    <button onClick={handlePdfHide}>Hide PDF</button>
+                </div>
+            </div>
+        )}
+    </div>
     );
 }
 
 function PdfRender() {
     return <div className={"pdf-renderer"}></div>
 }
-
-// export default App;
