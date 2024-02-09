@@ -14,6 +14,7 @@ export default function App() {
     const [pdfSource, setPdfSource] = useState('')
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
+    const [pdfFile, setPdfFile] = useState(null);
 
     const handlePdfRender = () => {
         if (answer) {
@@ -31,7 +32,6 @@ export default function App() {
     };
     const [showPDF, setShowPDF] = useState(false);
 
-    // const [showPDF, setShowPDF] = useState(answer !== undefined);
 
     const goToPrevPage = () => {
         setPageNumber((prevPage) => Math.max(prevPage - 1, 1)); // Limit to not go below page 1
@@ -39,6 +39,58 @@ export default function App() {
 
     const goToNextPage = () => {
         setPageNumber((prevPage) => Math.min(prevPage + 1, numPages)); // Limit to not go above numPages
+    };
+
+    const handleFileChange = (e) => {
+        setPdfFile(e.target.files[0]);
+    };
+
+    const handleFileUpload = async () => {
+        try {
+            setLoading(true);
+            const formData = new FormData();
+            formData.append("file", pdfFile);
+
+            // Call the /upload API
+            const uploadResponse = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+
+            if (!uploadResponse.status) {
+                throw new Error("Failed to upload file");
+            }
+            else {
+                // Call the /ingest API
+                const ingestResponse = await fetch("/api/ingest", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!ingestResponse.ok) {
+                    throw new Error("Failed to ingest file");
+                }
+
+                // Handle the response from /ingest API
+                const result = await ingestResponse.json();
+                console.log("Ingest response:", result);
+
+                // Set the answer or perform other actions based on the response
+                setAnswer("File uploaded and ingested successfully");
+            }
+
+        }
+        catch (error) {
+            console.error("Error:", error);
+            setAnswer("An error occurred during file upload and ingestion");
+        } finally {
+            setLoading(false);
+        }
+
+
     };
 
 
@@ -95,8 +147,24 @@ export default function App() {
     };
 
     return (<div className="screen">
-        <div className="navbar">Navbar content here</div>
-        <div className="app">
+        <div className="navbar">
+            <label htmlFor="fileInput" className="fileInputLabel">
+                Upload File
+            </label>
+            <input
+                type="file"
+                id="fileInput"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+            />
+            {pdfFile && (
+                <button onClick={handleFileUpload} className="submitButton">
+                    Submit
+                </button>
+            )}
+        </div>
+
+        <div div className="app" >
             <div className="app-container">
                 <div className="spotlight__wrapper">
                     <input
@@ -145,8 +213,9 @@ export default function App() {
                     <button onClick={handlePdfHide}>Hide PDF</button>
                 </div>
             </div>
-        )}
-    </div>
+        )
+        }
+    </div >
     );
 }
 

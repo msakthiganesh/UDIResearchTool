@@ -103,6 +103,36 @@ pre {
 }
 
 
+.navbar input[type="file"] {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 10px; /* Space between the file input and the submit button */
+}
+
+.navbar button {
+  background-color: #4CAF50; /* Green background */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 30px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: none; /* Hide the button initially */
+}
+
+/* Show the submit button only when a file is selected */
+.navbar input[type="file"]:valid + button {
+  display: inline-block; /* Show the button when a file is selected */
+}
+
+
 .pdf-renderer.collapsed {
   width: 0;
 }
@@ -134,6 +164,7 @@ pre {
   border-radius: 5px;
   cursor: pointer;
 }
+
 
 button {
   padding: 10px 15px;
