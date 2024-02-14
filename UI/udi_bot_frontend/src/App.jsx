@@ -44,7 +44,7 @@ export default function App() {
     };
 
     const handleFileChange = (e) => {
-        setPdfFile(e.target.files[0]);
+        setPdfFile(e.target.files);
     };
 
     const handleFileUpload = async () => {
@@ -52,7 +52,9 @@ export default function App() {
             setLoading(true);
             setIsFileUploaded(true);
             const formData = new FormData();
-            formData.append("file", pdfFile);
+            for (let i = 0; i < pdfFile.length; i++) {
+                formData.append("file", pdfFile[i]);  // Append each file to the form data
+            }
 
             // Call the /upload API
             const uploadResponse = await fetch("/api/upload", {
@@ -84,7 +86,7 @@ export default function App() {
                 // Set the answer or perform other actions based on the response
                 setAnswer("File uploaded and ingested successfully");
                 setIsMessageFromAPI(false);
-                
+
             }
 
         }
@@ -159,9 +161,10 @@ export default function App() {
             </label>
             <input
                 type="file"
-                id="fileInput"
+                id="file"
+                name="file"
+                multiple  // Allow multiple file selection
                 onChange={handleFileChange}
-                style={{ display: "none" }}
             />
             {pdfFile && !isFileUploaded && (
                 <button onClick={handleFileUpload} className="submitButton">

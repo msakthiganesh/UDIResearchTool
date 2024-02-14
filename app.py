@@ -36,13 +36,15 @@ def upload():
         if 'file' not in request.files:
             return "No File Found!"
         try:
-            pdf_file = request.files['file']
-            pdf_name = pdf_file.filename
-            save_path = os.path.join(os.getenv('UPLOAD_DIR'), pdf_name)
-            pdf_file.save(save_path, )
+            uploaded_files = request.files.getlist("file")  # Get a list of uploaded files
+            for file in uploaded_files:
+                pdf_name = file.filename
+                save_path = os.path.join(os.getenv('UPLOAD_DIR'), pdf_name)
+                file.save(save_path)
+            return jsonify(status = 200, success=True, message='File uploaded successfully.')
         except Exception as e:
             return jsonify(status = 500, success = False, message = e)
-        return jsonify(status = 200, success=True, message='File uploaded successfully.')
+        
 
 
 @app.route('/ingest', methods=['GET'])
