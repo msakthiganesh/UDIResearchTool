@@ -1,4 +1,4 @@
-# UDIResearchTool
+# UDI Research Tool
 
 <a name="readme-top"></a>
 
