@@ -8,3 +8,4 @@ uploads/**
 /logs.log
 /UI/udi_bot_frontend/datastore/
 UI/udi_bot_frontend/uploads
+UI/.DS_Store

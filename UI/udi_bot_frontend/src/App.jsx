@@ -17,6 +17,8 @@ export default function App() {
     const [pdfFile, setPdfFile] = useState(null);
     const [isMessageFromAPI, setIsMessageFromAPI] = useState(false);
     const [isFileUploaded, setIsFileUploaded] = useState(false);
+    const [showFileInput, setShowFileInput] = useState(false);
+    const [pdffilename, setPdfFilename] = useState('');
 
     const handlePdfRender = () => {
         if (answer) {
@@ -51,6 +53,7 @@ export default function App() {
         try {
             setLoading(true);
             setIsFileUploaded(true);
+            setShowFileInput(true);
             const formData = new FormData();
             for (let i = 0; i < pdfFile.length; i++) {
                 formData.append("file", pdfFile[i]);  // Append each file to the form data
@@ -88,8 +91,9 @@ export default function App() {
                 setIsMessageFromAPI(false);
 
             }
-
+            setShowFileInput(false);
         }
+
         catch (error) {
             console.error("Error:", error);
             setAnswer("An error occurred during file upload and ingestion");
@@ -131,17 +135,21 @@ export default function App() {
 
             let pdf_source = '';
             let page = '';
+            let pdf_filename = '';
 
             if (sourceMatch) {
                 pdf_source = sourceMatch[1]; // This will be your source string
                 page = sourceMatch[2]; // This will be your page string
+                pdf_filename = pdf_source.split('/').pop();
                 setPdfSource(pdf_source)
                 setPageNumber(parseInt(page))
+                setPdfFilename(pdf_filename)
             }
 
             // Remove the 'Source' line from the message
             const message = msg_with_source.replace(sourceRegex, '');
             // console.log(message);
+            console.log(`PDF Filename: ${pdf_filename}`)
             // console.log(`Source: ${pdf_source}`);
             // console.log(`Page: ${page}`);
 
@@ -156,16 +164,17 @@ export default function App() {
 
     return (<div className="screen">
         <div className="navbar">
-            <label htmlFor="fileInput" className="fileInputLabel">
-                Upload File
-            </label>
-            <input
-                type="file"
-                id="file"
-                name="file"
-                multiple  // Allow multiple file selection
-                onChange={handleFileChange}
-            />
+            <button onClick={handleFileUpload}>Upload Files</button>
+            {showFileInput && (  // Render the file input based on the state
+                <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    multiple
+                    onChange={handleFileChange}
+                />
+            )}
+
             {pdfFile && !isFileUploaded && (
                 <button onClick={handleFileUpload} className="submitButton">
                     Submit
@@ -203,6 +212,7 @@ export default function App() {
         {showPDF && (
             <div className="pdf-renderer">
                 <div>
+                    <div className="pdf-filename">{pdffilename}</div>
                     <Document
                         file={pdfSource}
                         onLoadSuccess={onDocumentLoadSuccess}
