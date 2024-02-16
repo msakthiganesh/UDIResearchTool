@@ -48,9 +48,9 @@ The project is a web application built using React that allows users to upload a
 
 <!-- URLS -->
 [issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
+[issues-url]: https://github.com/msakthiganesh/UDIResearchTool/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
+[license-url]: https://github.com/msakthiganesh/UDIResearchTool/blob/c9a9d9392ca6182a2614529416c958f2ba1bf75d/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/msakthiganesh/
 [product-screenshot]: images/ui.png
