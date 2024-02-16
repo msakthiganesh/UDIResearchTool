@@ -47,7 +47,7 @@ The project is a web application built using React that allows users to upload a
 
 
 <!-- URLS -->
-[issues-shield]: https://img.shields.io/github/issues/msakthiganesh/UDIResearchTool
+[issues-shield]: https://img.shields.io/github/issues/msakthiganesh/UDIResearchTool?style=for-the-badge
 [issues-url]: https://github.com/msakthiganesh/UDIResearchTool/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/msakthiganesh/UDIResearchTool/blob/c9a9d9392ca6182a2614529416c958f2ba1bf75d/LICENSE.txt
