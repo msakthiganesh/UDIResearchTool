@@ -98,7 +98,9 @@ The Flask application should be available in ```http://localhost:8001```
 
 - [x] Allow multiple file upload
 - [x] Render relevant PDF for the generated content/answer
-- [ ] Add conversation history
+- [ ] Add session history/auth
+  - [ ] Add conversation history based on session
+  - [ ] Allow resetting session history based on auth
 - [ ] Allow multiple source rendering in UI
 
 
