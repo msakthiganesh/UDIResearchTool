@@ -32,7 +32,7 @@ dataclasses-json==0.6.4
     #   langchain-community
 exceptiongroup==1.2.0
     # via anyio
-flask==2.2.5
+flask~=3.0.0
     # via -r requirements.in
 frozenlist==1.4.1
     # via
@@ -55,7 +55,7 @@ jsonpatch==1.33
     #   langchain-core
 jsonpointer==2.4
     # via jsonpatch
-langchain==0.1.6
+langchain~=0.0.350
     # via -r requirements.in
 langchain-community==0.0.19
     # via langchain
@@ -95,7 +95,7 @@ pydantic==2.6.1
     #   langsmith
 pydantic-core==2.16.2
     # via pydantic
-python-dotenv==1.0.1
+python-dotenv~=1.0.0
     # via -r requirements.in
 pyyaml==6.0.1
     # via
