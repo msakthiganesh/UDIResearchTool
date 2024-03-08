@@ -20,7 +20,7 @@ def create_vectorstore(doc_chunks, embedding_type: str = "openai", save_db: bool
         documents=doc_chunks,
         embedding=embeddings
     )
-    filenames = helper.db_filenames(vectordb="faiss")
+    filenames = helper.vectordb_filenames(vectordb="faiss")
     if save_db:
         vectorstore.save_local(folder_path=os.getenv('VECTORDB_OPENAI_FAISS'))
     else:

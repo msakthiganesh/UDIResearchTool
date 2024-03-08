@@ -8,7 +8,7 @@ from flask import jsonify
 from langchain.vectorstores.faiss import FAISS
 
 
-def db_filenames(vectordb: str = "faiss") -> List[str]:
+def vectordb_filenames(vectordb: str = "faiss") -> List[str]:
     if vectordb == "faiss":
         files = os.listdir(os.getenv('DATASTORE_DIR'))
         with open("db/openai/faiss/faiss_files.txt", 'w+') as f:
@@ -16,7 +16,7 @@ def db_filenames(vectordb: str = "faiss") -> List[str]:
         return files
 
 
-def create_or_merge(vector_db: str) -> bool:
+def vectordb_create_or_merge(vector_db: str) -> bool:
     """_summary_
 
     Args:

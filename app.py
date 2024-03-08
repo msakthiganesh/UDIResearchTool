@@ -56,7 +56,7 @@ def upload():
 def ingest_to_db():
     if request.method == 'GET':
         upload_flag = helper.move_files_to_store(source=os.getenv('UPLOAD_DIR'), destination=os.getenv('DATASTORE_DIR'))
-        merge_flag = helper.create_or_merge(vector_db='faiss')
+        merge_flag = helper.vectordb_create_or_merge(vector_db='faiss')
 
         if upload_flag and merge_flag:  # Merge new uploads to vector DB
             try:
