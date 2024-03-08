@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import List
 import shutil
+import pymongo
+from flask import jsonify
 # from langchain_community.vectorstores.faiss import FAISS as FAISS_C
 from langchain.vectorstores.faiss import FAISS
 
@@ -44,3 +46,12 @@ def move_files_to_store(source: str, destination: str) -> bool:
             print(f"Error while moving files - {e}")
     return False
 
+
+def init_db():
+    try:
+        client = pymongo.MongoClient(os.getenv('MONGODB_URL'))
+        database = client[os.getenv('MONGODB_NAME')]
+        collection = database[os.getenv('MONGODB_COLLECTION')]
+        return collection, jsonify(status=200, success=True, message="Established Connection to DB")
+    except Exception as e:
+        return jsonify(status=500, success=False, message=f"{e}")

@@ -1,3 +1,5 @@
+import datetime
+from datetime import timezone
 import json
 import os
 from dotenv import load_dotenv
@@ -24,6 +26,9 @@ logger = logging.getLogger('LOGGER_NAME')
 load_dotenv()
 logger.info("Environment Variables loaded.")
 
+with app.app_context():
+    db, db_connection_status = helper.init_db()
+    logger.info(f"Connection to DB: {db_connection_status.status}")
 
 @app.route("/")
 def home():
@@ -41,10 +46,9 @@ def upload():
                 pdf_name = file.filename
                 save_path = os.path.join(os.getenv('UPLOAD_DIR'), pdf_name)
                 file.save(save_path)
-            return jsonify(status = 200, success=True, message='File uploaded successfully.')
+            return jsonify(status=200, success=True, message='File uploaded successfully.')
         except Exception as e:
-            return jsonify(status = 500, success = False, message = e)
-        
+            return jsonify(status=500, success=False, message=e)
 
 
 @app.route('/ingest', methods=['GET'])
@@ -60,21 +64,21 @@ def ingest_to_db():
                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
                 upload_vectors = create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=False)
                 update_vectorstore(upload_vector=upload_vectors, embedding_type='openai')
-                return jsonify(status = 200, success=True, message='Vector DB updated successfully.')
+                return jsonify(status=200, success=True, message='Vector DB updated successfully.')
             except Exception as e:
-                return jsonify(status = 500, success = False, message = 'Error occurred while updating Vector Database.')
+                return jsonify(status=500, success=False, message='Error occurred while updating Vector Database.')
 
         elif upload_flag:  # Create a new vector DB
             try:
                 pdf_docs = get_pdf_text(pdf_dir_path=os.getenv('DATASTORE_DIR'))
                 document_chunks = get_text_chunks(py_pdf_docs=pdf_docs)
                 create_vectorstore(doc_chunks=document_chunks, embedding_type='openai', save_db=True)
-                return jsonify(status = 200, success=True, message='Vector DB created successfully.')
+                return jsonify(status=200, success=True, message='Vector DB created successfully.')
             except Exception as e:
-                return jsonify(status = 500, success = False, message = 'Error occurred while creating Vector Database.')
+                return jsonify(status=500, success=False, message='Error occurred while creating Vector Database.')
 
         else:
-            return jsonify(status = 500, success = False, message = 'No file found. Please upload files to ingest.')
+            return jsonify(status=500, success=False, message='No file found. Please upload files to ingest.')
 
 
 @app.route("/fetch", methods=['GET'])
@@ -104,7 +108,14 @@ def generate():
             response["source_documents"][0].metadata['page'] += 1
             response["source_documents"][0].metadata['source'] = response["source_documents"][0].metadata['source'][19:]
             answer = f'{response["answer"]} \n\n Source: {response["source_documents"][0].metadata}'
+            db.insert_one({
+                "question": request.form.get('query'),
+                "answer": response["answer"],
+                "metadata": response["source_documents"][0].metadata,
+                "timestamp": datetime.datetime.now(timezone.utc)
+            })
             logger.info(f"Answer: {json.dumps(answer)}")
+
             return jsonify(answer)
         else:
             return jsonify("Please type your question.")
