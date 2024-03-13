@@ -3,7 +3,7 @@ import './ChatBox.css'
 export function ChatBox() {
     return <>
         {/* Prompt Messages Container - Modify the height according to your need */}
-        <div className="flex h-[97vh] w-full flex-col">
+        <div className="flex h-[100vh] w-full flex-col">
             {/* Prompt Messages */}
             <div
                 className="flex-1 overflow-y-auto bg-slate-300 text-sm leading-6 text-slate-900 shadow-md dark:bg-slate-800 dark:text-slate-300 sm:text-base sm:leading-7"
@@ -185,7 +185,7 @@ export function ChatBox() {
 
             {/* Prompt message input */}
             <form
-                className="flex w-full items-center rounded-b-md border-t border-slate-300 bg-slate-200 p-2 dark:border-slate-700 dark:bg-slate-900"
+                className="flex w-full items-center border-t border-slate-300 bg-slate-200 p-2 dark:border-slate-700 dark:bg-slate-900"
             >
                 <label htmlFor="chat" className="sr-only">Enter your prompt</label>
                 <div>

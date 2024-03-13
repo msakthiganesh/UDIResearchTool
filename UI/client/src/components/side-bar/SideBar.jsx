@@ -1,6 +1,30 @@
 import './SideBar.css'
+import React, {useEffect} from "react";
+import Axios from 'axios';
+
 
 export function SideBar() {
+    const [list, setList] = React.useState([]);
+    useEffect(() => {
+        Axios.get('http://localhost:4000/api/conversations')
+            .then((res)=> setList(res.data));
+    }, []);
+
+    let val = list.map((item)=>{
+        return <p>{item}</p>
+    });
+    console.log(val)
+
+    // return (
+    //     <div>
+    //         <ol>
+    //             {val}
+    //         </ol>
+    //     </div>
+    // )
+
+
+
     return <>
         {/* Sidebar */}
         <aside className="flex">
@@ -50,70 +74,86 @@ export function SideBar() {
                     </button>
                 </div>
                 {/* Previous chats container */}
+
                 <div
-                    className="h-1/2 space-y-4 overflow-y-auto border-b border-slate-300 px-2 py-4 dark:border-slate-700"
-                >
-                    <button
-                        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"
-                    >
-                        <h1
-                            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"
+                    className="h-1/2 space-y-4 overflow-y-auto border-b border-slate-300 px-2 py-4 dark:border-slate-700">
+                    {val.map((item, index) => (
+                        <button
+                            key={index}
+                            className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"
                         >
-                            Tailwind Classes
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">12 Mar</p>
-                    </button>
-                    <button
-                        className="flex w-full flex-col gap-y-2 rounded-lg bg-slate-200 px-3 py-2 text-left transition-colors duration-200 focus:outline-none dark:bg-slate-800"
-                    >
-                        <h1
-                            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"
-                        >
-                            explain quantum computing
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">10 Feb</p>
-                    </button>
-                    <button
-                        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"
-                    >
-                        <h1
-                            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"
-                        >
-                            How to create ERP Diagram
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">22 Jan</p>
-                    </button>
-                    <button
-                        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"
-                    >
-                        <h1
-                            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"
-                        >
-                            API Scaling Strategies
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">1 Jan</p>
-                    </button>
-                    <button
-                        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"
-                    >
-                        <h1
-                            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"
-                        >
-                            What is GPT UI?
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">1 Jan</p>
-                    </button>
-                    <button
-                        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"
-                    >
-                        <h1
-                            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"
-                        >
-                            How to use Tailwind components?
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">1 Jan</p>
-                    </button>
+                            <h1 className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200">
+                                {item.props.children.question}
+                            </h1>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{item.props.children.timestamp}</p>
+                        </button>
+                    ))}
                 </div>
+
+                {/*<div*/}
+                {/*    className="h-1/2 space-y-4 overflow-y-auto border-b border-slate-300 px-2 py-4 dark:border-slate-700"*/}
+                {/*>*/}
+                {/*    <button*/}
+                {/*        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"*/}
+                {/*    >*/}
+                {/*        <h1*/}
+                {/*            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"*/}
+                {/*        >*/}
+                {/*            {val}*/}
+                {/*        </h1>*/}
+                {/*        <p className="text-xs text-slate-500 dark:text-slate-400">12 Mar</p>*/}
+                {/*    </button>*/}
+                {/*    <button*/}
+                {/*        className="flex w-full flex-col gap-y-2 rounded-lg bg-slate-200 px-3 py-2 text-left transition-colors duration-200 focus:outline-none dark:bg-slate-800"*/}
+                {/*    >*/}
+                {/*        <h1*/}
+                {/*            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"*/}
+                {/*        >*/}
+                {/*            explain quantum computing*/}
+                {/*        </h1>*/}
+                {/*        <p className="text-xs text-slate-500 dark:text-slate-400">10 Feb</p>*/}
+                {/*    </button>*/}
+                {/*    <button*/}
+                {/*        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"*/}
+                {/*    >*/}
+                {/*        <h1*/}
+                {/*            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"*/}
+                {/*        >*/}
+                {/*            How to create ERP Diagram*/}
+                {/*        </h1>*/}
+                {/*        <p className="text-xs text-slate-500 dark:text-slate-400">22 Jan</p>*/}
+                {/*    </button>*/}
+                {/*    <button*/}
+                {/*        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"*/}
+                {/*    >*/}
+                {/*        <h1*/}
+                {/*            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"*/}
+                {/*        >*/}
+                {/*            API Scaling Strategies*/}
+                {/*        </h1>*/}
+                {/*        <p className="text-xs text-slate-500 dark:text-slate-400">1 Jan</p>*/}
+                {/*    </button>*/}
+                {/*    <button*/}
+                {/*        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"*/}
+                {/*    >*/}
+                {/*        <h1*/}
+                {/*            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"*/}
+                {/*        >*/}
+                {/*            What is GPT UI?*/}
+                {/*        </h1>*/}
+                {/*        <p className="text-xs text-slate-500 dark:text-slate-400">1 Jan</p>*/}
+                {/*    </button>*/}
+                {/*    <button*/}
+                {/*        className="flex w-full flex-col gap-y-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:hover:bg-slate-800"*/}
+                {/*    >*/}
+                {/*        <h1*/}
+                {/*            className="text-sm font-medium capitalize text-slate-700 dark:text-slate-200"*/}
+                {/*        >*/}
+                {/*            How to use Tailwind components?*/}
+                {/*        </h1>*/}
+                {/*        <p className="text-xs text-slate-500 dark:text-slate-400">1 Jan</p>*/}
+                {/*    </button>*/}
+                {/*</div>*/}
                 <div className="mt-auto w-full space-y-4 px-2 py-4">
                     <button
                         className="flex w-full gap-x-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-200 focus:outline-none dark:text-slate-200 dark:hover:bg-slate-800"

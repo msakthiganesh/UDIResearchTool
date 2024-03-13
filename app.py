@@ -12,6 +12,7 @@ from langchain.vectorstores.faiss import FAISS
 import helper
 import sys
 import logging
+from bson import json_util
 
 app = Flask(__name__)
 file_handler = logging.FileHandler(filename='logs.log')
@@ -29,6 +30,7 @@ logger.info("Environment Variables loaded.")
 with app.app_context():
     db, db_connection_status = helper.init_db()
     logger.info(f"Connection to DB: {db_connection_status.status}")
+
 
 @app.route("/")
 def home():
@@ -119,6 +121,20 @@ def generate():
             return jsonify(answer)
         else:
             return jsonify("Please type your question.")
+
+
+@app.route("/client_conversation_fetch", methods=['GET'])
+def client_conversation_fetch():
+    if request.method == 'GET':
+        project = {
+            'question': 1,
+            'timestamp': 1
+        }
+        conversation_cursor = db.find(projection=project)
+        json_items = json_util.dumps(conversation_cursor)
+        json_items = json.loads(json_items)
+        return json_items
+
 
 
 if __name__ == '__main__':
